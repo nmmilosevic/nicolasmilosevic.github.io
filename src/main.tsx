@@ -9,7 +9,7 @@ import { TrailCursor } from './components/TrailCursor.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <BrowserRouter>
+    <BrowserRouter basename="/nicolasmilosevic.github.io">
       <TrailCursor />
       <ScrollToTop />
       <Routes>
