@@ -118,7 +118,7 @@ export function Navbar() {
 
             {/* Floating animated tag */}
             <motion.div
-              className="relative inline-block md:mr-16"
+              className="relative inline-block mr-10 md:mr-16"
               animate={{ x: [0, 3, -2, 1, 0], y: [0, -5, -3, -4, 0] }}
               transition={floatTransition(0)}
             >
