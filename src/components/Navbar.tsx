@@ -51,8 +51,8 @@ export function Navbar() {
 
   return (
     <>
-      <header className="fixed top-4 inset-x-0 z-50 px-4 md:px-6">
-        <div className="mx-auto max-w-5xl flex items-center justify-between px-5 py-3 rounded-2xl">
+      <header className="fixed top-4 inset-x-0 z-50 px-6">
+        <div className="mx-auto max-w-5xl flex items-center justify-between py-3 md:px-5 rounded-2xl">
 
           {/* Left: role label + floating name pill */}
           <Link
@@ -118,8 +118,7 @@ export function Navbar() {
 
             {/* Floating animated tag */}
             <motion.div
-              className="relative inline-block"
-              style={{ marginRight: '64px' }}
+              className="relative inline-block md:mr-16"
               animate={{ x: [0, 3, -2, 1, 0], y: [0, -5, -3, -4, 0] }}
               transition={floatTransition(0)}
             >

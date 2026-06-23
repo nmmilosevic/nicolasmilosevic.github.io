@@ -11,11 +11,21 @@ export function TrailCursor() {
   const [positions, setPositions] = useState(TRAIL_COLORS.map(() => ({ x: -999, y: -999 })))
   const [stopped, setStopped] = useState(false)
   const [visible, setVisible] = useState(false)
+  const [finePointer, setFinePointer] = useState(false)
   const rafRef = useRef<number>(0)
   const stopTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const initRef = useRef(false)
 
   useEffect(() => {
+    const mq = window.matchMedia('(hover: hover) and (pointer: fine)')
+    const update = () => setFinePointer(mq.matches)
+    update()
+    mq.addEventListener('change', update)
+    return () => mq.removeEventListener('change', update)
+  }, [])
+
+  useEffect(() => {
+    if (!finePointer) return
     const tick = () => {
       posRef.current[0] = { ...mouseRef.current }
       for (let i = 1; i < TRAIL_COLORS.length; i++) {
@@ -56,9 +66,9 @@ export function TrailCursor() {
       cancelAnimationFrame(rafRef.current)
       if (stopTimerRef.current) clearTimeout(stopTimerRef.current)
     }
-  }, [])
+  }, [finePointer])
 
-  if (!visible) return null
+  if (!finePointer || !visible) return null
 
   return createPortal(
     <>
