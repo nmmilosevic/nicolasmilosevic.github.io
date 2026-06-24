@@ -1,14 +1,21 @@
 import { useState, useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 
-const TRAIL_COLORS = ['#1a10d6', '#6366f1', '#a855f7', '#ec4899', '#f59e0b']
+const BRAND_BLUE = '#1a10d6'
+const TRAIL_LENGTH = 5
 const LERP = 0.18
 const STOP_DELAY = 150
 
+/** Linear opacity gradient: 100% at cursor → 0% at tail */
+function trailOpacity(index: number, total: number) {
+  if (total <= 1) return 1
+  return 1 - index / (total - 1)
+}
+
 export function TrailCursor() {
   const mouseRef = useRef({ x: -999, y: -999 })
-  const posRef = useRef(TRAIL_COLORS.map(() => ({ x: -999, y: -999 })))
-  const [positions, setPositions] = useState(TRAIL_COLORS.map(() => ({ x: -999, y: -999 })))
+  const posRef = useRef(Array.from({ length: TRAIL_LENGTH }, () => ({ x: -999, y: -999 })))
+  const [positions, setPositions] = useState(Array.from({ length: TRAIL_LENGTH }, () => ({ x: -999, y: -999 })))
   const [stopped, setStopped] = useState(false)
   const [visible, setVisible] = useState(false)
   const [finePointer, setFinePointer] = useState(false)
@@ -28,7 +35,7 @@ export function TrailCursor() {
     if (!finePointer) return
     const tick = () => {
       posRef.current[0] = { ...mouseRef.current }
-      for (let i = 1; i < TRAIL_COLORS.length; i++) {
+      for (let i = 1; i < TRAIL_LENGTH; i++) {
         const prev = posRef.current[i - 1]
         const cur = posRef.current[i]
         posRef.current[i] = {
@@ -42,7 +49,7 @@ export function TrailCursor() {
 
     const onMove = (e: MouseEvent) => {
       if (!initRef.current) {
-        posRef.current = TRAIL_COLORS.map(() => ({ x: e.clientX, y: e.clientY }))
+        posRef.current = Array.from({ length: TRAIL_LENGTH }, () => ({ x: e.clientX, y: e.clientY }))
         initRef.current = true
       }
       mouseRef.current = { x: e.clientX, y: e.clientY }
@@ -72,8 +79,9 @@ export function TrailCursor() {
 
   return createPortal(
     <>
-      {TRAIL_COLORS.map((color, i) => {
-        const pos = positions[i]
+      {positions.map((pos, i) => {
+        const alpha = trailOpacity(i, TRAIL_LENGTH)
+        if (alpha <= 0) return null
         return (
           <div
             key={i}
@@ -81,12 +89,13 @@ export function TrailCursor() {
             style={{
               left: pos.x,
               top: pos.y,
-              width: 8,
-              height: 8,
-              backgroundColor: color,
+              width: 10,
+              height: 10,
+              borderRadius: '50%',
+              backgroundColor: BRAND_BLUE,
               transform: 'translate(-50%, -50%)',
               zIndex: 9999 - i,
-              opacity: stopped && i > 0 ? 0 : 1 - i * 0.15,
+              opacity: stopped && i > 0 ? 0 : alpha,
               transition: stopped && i > 0
                 ? `opacity ${0.3 + i * 0.08}s ease ${i * 0.04}s`
                 : 'none',
